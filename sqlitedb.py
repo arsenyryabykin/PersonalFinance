@@ -17,7 +17,7 @@ def make_expenses():
     cursor.execute('''CREATE TABLE IF NOT EXISTS expenses(
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 category TEXT NOT NULL,
-                sum INTEGER NOT NULL,
+                sum INTEGER,
                 date TEXT NOT NULL
                 )''')
 
@@ -33,8 +33,10 @@ def add_day_expenses(cat, summa, data):
         print("Успешная вставка")
 
 def show():
-    cursor.execute("SELECT * from expenses")
-    print(cursor.fetchall())
+    cursor.execute("SELECT category, sum, date from expenses")
+    a = cursor.fetchall()
+    print(a)
+    return a
 
 
 def get_day_expenses(cat, data):
