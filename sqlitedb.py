@@ -11,20 +11,39 @@ def database_init():
         print("Успешное подключение к БД")
 
 
-# Создание таблицы расходов на текущий месяц
+
 def make_expenses():
-    # cursor.execute('''DROP TABLE IF EXISTS expenses''')
+    """ "Создание таблицы расходов" """
     cursor.execute('''CREATE TABLE IF NOT EXISTS expenses(
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 category TEXT NOT NULL,
                 sum INTEGER,
                 date TEXT NOT NULL
                 )''')
-
-    # i = [(1,),(2,),(3,)]
-    # cursor.executemany("INSERT INTO expenses(day) VALUES(?)", i)
-
     connection.commit()
+
+def make_income():
+    """ "Создание таблицы доходов" """
+    cursor.execute('''CREATE TABLE IF NOT EXISTS income(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                category TEXT NOT NULL,
+                sum INTEGER,
+                date TEXT NOT NULL
+                )''')
+    connection.commit()
+
+def make_deposits():
+    """ "Создание таблицы вкладов" """
+    cursor.execute('''CREATE TABLE IF NOT EXISTS deposits(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                bank TEXT NOT NULL,
+                sum INTEGER NOT NULL,
+                percent REAL NOT NULL,
+                date_from TEXT NOT NULL,
+                date_to TEXT NOT NULL
+                )''')
+    connection.commit()
+
 
 def add_day_expenses(cat, summa, data):
     cursor.execute(f"INSERT INTO expenses(category, sum, date) VALUES(?, ?, ?)", (cat, summa, data))
@@ -32,10 +51,31 @@ def add_day_expenses(cat, summa, data):
     if connection:
         print("Успешная вставка")
 
-def show():
-    cursor.execute("SELECT category, sum, date from expenses")
+def add_day_income(cat, summa, data):
+    cursor.execute(f"INSERT INTO income(category, sum, date) VALUES(?, ?, ?)", (cat, summa, data))
+    connection.commit()
+    if connection:
+        print("Успешная вставка")
+
+def add_deposit(bank, sum, percent, date_from, date_to):
+    cursor.execute(f"INSERT INTO deposits(bank, sum, percent, date_from, date_to) VALUES(?, ?, ?, ?, ?)", (bank, sum, percent, date_from, date_to))
+    connection.commit()
+    if connection:
+        print("Успешная вставка")
+
+def get_expenses():
+    cursor.execute("SELECT category, sum, date FROM expenses")
     a = cursor.fetchall()
-    print(a)
+    return a
+
+def get_income():
+    cursor.execute("SELECT category, sum, date FROM income")
+    a = cursor.fetchall()
+    return a
+
+def get_deposits():
+    cursor.execute("SELECT bank, sum, percent, date_from, date_to FROM deposits")
+    a = cursor.fetchall()
     return a
 
 

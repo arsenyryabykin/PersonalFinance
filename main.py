@@ -5,44 +5,32 @@ from read import get_data
 from tkinter import *
 from tkinter import ttk
 
+from window import Window, WindowDep
+
 sqlitedb.database_init()
 sqlitedb.make_expenses()
+sqlitedb.make_income()
+sqlitedb.make_deposits()
 
 # content = get_data(5, 'products')
-# for el in content:
-#     sqlitedb.add_day_expenses(el[0], el[1], el[2])
-#
 # content = get_data(10, 'transport')
-# for el in content:
-#     sqlitedb.add_day_expenses(el[0], el[1], el[2])
-#
 # content = get_data(12, 'cafe')
 # for el in content:
 #     sqlitedb.add_day_expenses(el[0], el[1], el[2])
 
-class Window(Tk):
-    def __init__(self, title_, content):
-        super().__init__()
+# content = get_data(20, "save_acc_%")
+# content = get_data(24, "advance")
+# content = get_data(27, "salary")
+#
+# for el in content:
+#     sqlitedb.add_day_income(el[0], el[1], el[2])
 
-        self.title(str(title_))
-        self.geometry("600x300")
+# sqlitedb.add_deposit("ВТБ", 300000, 15.6, "2025-10-06", '2026-02-03')
+# sqlitedb.add_deposit("ВТБ", 585000, 15.6, "2025-10-06", '2026-02-03')
+# sqlitedb.add_deposit("Сбер", 300000, 16, "2025-08-12", '2025-12-12')
+# sqlitedb.add_deposit("Сбер", 250000, 16, "2025-11-08", '2026-02-08')
 
-        columns = ("category", "sum", "date")
-        #
-        tree = ttk.Treeview(master=self, show="headings", columns=columns)
-        tree.pack(fill=BOTH, expand=1)
-        # tree.grid(row=0, column=0, sticky="nsew")
-        #
-        tree.heading("category", text="Категория", anchor=S)
-        tree.heading("sum", text="Сумма", anchor=S)
-        tree.heading("date", text="Дата", anchor=S)
-        #
-        tree.column("#1", stretch=YES, anchor=N)
-        tree.column("#2", stretch=YES, anchor=N)
-        tree.column("#3", stretch=YES, anchor=N)
-        # #
-        for person in content:
-            tree.insert("", END, values=person)
+
 
 
 
@@ -56,11 +44,25 @@ root.columnconfigure(index=0, weight=1)
 # b = sqlitedb.show()
 
 def make_expenses_window():
-    Window("Расходы", sqlitedb.show())
+    Window("Расходы", sqlitedb.get_expenses())
+
+def make_income_window():
+    Window("Доходы", sqlitedb.get_income())
+
+def make_deposits_window():
+    WindowDep("Вклады", sqlitedb.get_deposits())
 
 
 button1 = ttk.Button(text="Расходы", command=make_expenses_window)
 button1.pack(anchor=CENTER, expand=1)
+
+button2 = ttk.Button(text="Доходы", command=make_income_window)
+button2.pack(anchor=CENTER, expand=0)
+
+button3 = ttk.Button(text="Вклады", command=make_deposits_window)
+button3.pack(anchor=CENTER, expand=1)
+
+
 
 root.mainloop()
 
