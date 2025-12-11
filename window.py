@@ -66,6 +66,7 @@ class WindowDep(Tk):
             tree.insert("", END, values=el)
 
 class GraphWindow(Tk):
+
     def __init__(self, title_, data):
         super().__init__()
 
@@ -88,22 +89,38 @@ class GraphWindow(Tk):
 
 
 
-        figure = Figure(figsize=(10, 10), dpi=100)
-        figure_canvas = FigureCanvasTkAgg(figure, frame)
-        # plt = figure.add_subplot(1, 2, 1)
-        # plt.bar(x, y)
+        self.figure = Figure(figsize=(10, 10), dpi=100)
+        self.figure_canvas = FigureCanvasTkAgg(self.figure, frame)
+        self.plt = self.figure.add_subplot(1, 2, 1)
+        self.plt.bar(x, y)
 
 
 
-        plt2 = figure.add_subplot(1,1,1)
+        self.plt2 = self.figure.add_subplot(1,2,2)
         d = [(f"2024-{m}-01", f"2024-{m}-31") for m in ['02', '03', '04', '05', '06', '07', '08', '09', '10']]
         xx = ['2', '3', '4', '5', '6', '7', '8', '9', '10']
         yy = [sqlitedb.get_month_category_sum('products', el[0], el[1])[0] for el in d]
-        plt2.bar(xx, yy)
+        self.plt2.bar(xx, yy)
 
-        figure_canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
+        self.figure_canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
 
 
-        button3 = ttk.Label(master=frame2, text="Вклады")
+        button3 = ttk.Button(master=frame2, text="Вклады",command=self._change)
         button3.pack(anchor=CENTER, expand=0)
 
+
+    def _change(self):
+        print(1)
+        self.figure.clear()
+        self.figure_canvas.draw()
+        self.plt2 = self.figure.add_subplot(1, 1, 1)
+        d = [(f"2024-{m}-01", f"2024-{m}-31") for m in ['06', '07', '08', '09', '10', '11', '12']]
+        xx = ['6', '7', '8', '9', '10', '11', '12']
+        yy = [sqlitedb.get_month_category_sum('products', el[0], el[1])[0] for el in d]
+
+        self.plt2.bar(xx, yy)
+        self.figure_canvas.draw()
+
+
+    def _update(self):
+            pass
