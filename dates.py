@@ -13,7 +13,7 @@ def get_last_30_days():
     return last_month
 
 
-a = get_last_30_days()[0]
-print(a)
-dt = datetime.strptime(a, "%d %B %Y (%a)").date()
-print(dt)
+# a = get_last_30_days()[0]
+# print(a)
+# dt = datetime.strptime(a, "%d %B %Y (%a)").date()
+# print(dt)
