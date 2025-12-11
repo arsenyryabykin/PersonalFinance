@@ -88,3 +88,14 @@ def get_total_category_expenses(cat):
     cursor.execute("SELECT SUM(sum) FROM expenses WHERE category = ?", (cat,))
     b = cursor.fetchone()
     print(b)
+
+def get_category_expenses():
+    cursor.execute("SELECT category, SUM(sum) FROM expenses GROUP BY category")
+    b = cursor.fetchall()
+    return b
+
+# месячный подсчет расходов по одной категории
+def get_month_category_sum(cat, date_from, date_to):
+    cursor.execute("SELECT SUM(sum) FROM expenses WHERE category = ? AND date BETWEEN ? AND ?", (cat, date_from, date_to))
+    b = cursor.fetchone()
+    return b
