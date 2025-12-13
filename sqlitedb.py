@@ -63,6 +63,19 @@ def add_deposit(bank, sum, percent, date_from, date_to):
     if connection:
         print("Успешная вставка")
 
+def get_cats():
+    cursor.execute("SELECT category FROM expenses GROUP BY category")
+    a = cursor.fetchall()
+    b = [item[0] for item in a]
+    return b
+
+
+
+def get_sum_dep():
+    cursor.execute("SELECT SUM(sum) FROM deposits")
+    a = cursor.fetchone()
+    return a
+
 def get_expenses():
     cursor.execute("SELECT category, sum, date FROM expenses")
     a = cursor.fetchall()
@@ -79,10 +92,10 @@ def get_deposits():
     return a
 
 
-def get_day_expenses(cat, data):
-    cursor.execute("SELECT SUM(sum) FROM expenses WHERE category = ? AND date = ?", (cat, data))
-    b = cursor.fetchone()
-    print(b)
+def get_day_expenses(data):
+    cursor.execute("SELECT date, category, sum FROM expenses WHERE date = ?", (data,))
+    b = cursor.fetchall()
+    return b
 
 def get_total_category_expenses(cat):
     cursor.execute("SELECT SUM(sum) FROM expenses WHERE category = ?", (cat,))

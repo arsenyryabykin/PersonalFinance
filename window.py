@@ -34,21 +34,65 @@ class Window(Tk):
         for person in content:
             tree.insert("", END, values=person)
 
+class WW(Tk):
+    # TODO: реализовать табличку расходов последних 30 дней"
+    def __init__(self, title_, cats):
+        super().__init__()
+
+        self.count = 0
+
+        print(cats)
+
+        self.title(str(title_))
+        self.geometry("1000x500")
+
+        self.columns = ['date']
+        self.columns += cats
+        self.columns.append('total')
+
+        print(self.columns)
+
+        self.tree = ttk.Treeview(master=self, show="headings", columns=self.columns)
+        self.tree.pack(fill=Y, expand=1, anchor=CENTER)
+        for cat in self.columns:
+            self.tree.heading(cat, text=cat, anchor=S)
+
+        for i in range(1, len(self.columns) + 1):
+            self.tree.column("#" + str(i), stretch=YES, width = 70, anchor=CENTER)
+
+        self.tree.tag_configure("white", background='white')
+        self.tree.tag_configure("blue", background='lightblue')
+
+    def insert(self, day_exp):
+        print(day_exp)
+        insert_data = ['', '', '', '', '', '', '', '', '', '']
+        insert_data[0] = day_exp[0][0]
+        for i in range(1, len(self.columns)):
+            for exp in day_exp:
+                ind = self.columns.index(exp[1])
+                insert_data[ind] = exp[2]
+
+        if self.count % 2 == 0:
+            self.tree.insert("", 0, values=insert_data, tags=('white',))
+        else:
+            self.tree.insert("", 0, values=insert_data, tags=('blue',))
+        self.count += 1
 
 class WindowDep(Tk):
     def __init__(self, title_, content):
         super().__init__()
 
         self.title(str(title_))
-        self.geometry("600x250")
+        self.geometry("900x400")
         self.update_idletasks()
 
+        frame = ttk.Frame(self, padding=10, borderwidth=1, relief=GROOVE)
 
         columns = ("bank", "sum", "percent", "date_from", "date_to")
         #
-        tree = ttk.Treeview(master=self, show="headings", columns=columns)
-        tree.pack(fill=NONE, expand=1)
-        # tree.grid(row=0, column=0, sticky="nsew")
+        tree = ttk.Treeview(master=frame, show="headings", columns=columns)
+        tree.pack(fill=BOTH, expand=1)
+        # tree.grid(row=0, column=0)
         #
         tree.heading("bank", text="Банк", anchor=S)
         tree.heading("sum", text="Сумма", anchor=S)
@@ -56,70 +100,120 @@ class WindowDep(Tk):
         tree.heading("date_from", text="Дата открытия", anchor=S)
         tree.heading("date_to", text="Дата закрытия", anchor=S)
         #
-        tree.column("#1", stretch=NO, anchor=N)
-        tree.column("#2", stretch=NO, anchor=N)
-        tree.column("#3", stretch=NO, anchor=N)
-        tree.column("#4", stretch=NO, anchor=N)
-        tree.column("#5", stretch=NO, anchor=N)
+        tree.column("#1", stretch=YES, anchor=N)
+        tree.column("#2", stretch=YES, anchor=N)
+        tree.column("#3", stretch=YES, anchor=N)
+        tree.column("#4", stretch=YES, anchor=N)
+        tree.column("#5", stretch=YES, anchor=N)
         # #
         for el in content:
             tree.insert("", END, values=el)
 
-class GraphWindow(Tk):
+        tmp_frame = ttk.Frame(self, padding=10, borderwidth=1, relief=GROOVE)
+        label1 = ttk.Label(master=tmp_frame, text="Всего средств на вкладах")
+        label1.grid(row=0, column=0)
+        label2 = ttk.Label(master=tmp_frame, text=sqlitedb.get_sum_dep())
+        label2.grid(row=0, column=1)
 
+
+
+        frame.pack(anchor=W, expand=0)
+        tmp_frame.pack(anchor=W, expand=1, fill=BOTH)
+
+
+class GraphWindow(Tk):
+    # FIXME: asfasfsf
     def __init__(self, title_, data):
         super().__init__()
 
         self.title(str(title_))
-        self.geometry("500x500")
+        self.geometry("1000x800")
         self.update_idletasks()
 
-        frame = ttk.Frame(self, padding=10, borderwidth=1, relief=GROOVE)
-        frame.pack(side=TOP, expand=1, fill=BOTH)
-        frame.pack_propagate(False)
+        ####################
+        main_frame1 = ttk.Frame(self, padding=10, borderwidth=1, relief=RIDGE)
 
+        frame1 = ttk.Frame(main_frame1, padding=10, borderwidth=1, relief=GROOVE)
+        frame1.pack(side=TOP, expand=1, fill=BOTH)
+        frame1.pack_propagate(False)
 
-        frame2 = ttk.Frame(self, padding=10, borderwidth=1, relief=GROOVE)
-        frame2.pack(side=BOTTOM, expand=0, fill=BOTH)
-        frame2.config(height=100)
-        frame2.pack_propagate(False)
+        self.figure1 = Figure(figsize=(10, 10), dpi=100)
+        self.figure_canvas1 = FigureCanvasTkAgg(self.figure1, frame1)
+        self.figure_canvas1.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
 
         x = [a[0] for a in data]
         y = [b[1] for b in data]
 
+        self.ax1 = self.figure1.add_subplot(1, 1, 1)
+        self.ax1.bar(x, y, color="red")
+        self.ax1.set_title("Траты по категориям")
+        self.ax1.set_xticks(ticks=x)
+        self.ax1.set_xticklabels(x, rotation=45)
 
+        frame2 = ttk.Frame(main_frame1, padding=10, borderwidth=1, relief=GROOVE)
+        frame2.pack(side=BOTTOM, expand=0, fill=BOTH)
+        frame2.config(height=100)
+        frame2.pack_propagate(False)
 
-        self.figure = Figure(figsize=(10, 10), dpi=100)
-        self.figure_canvas = FigureCanvasTkAgg(self.figure, frame)
-        self.plt = self.figure.add_subplot(1, 2, 1)
-        self.plt.bar(x, y)
+        button3 = ttk.Button(master=frame2, text="Вклады",command=self._change)
+        button3.pack(anchor=CENTER, expand=0)
 
+        ####################
 
+        main_frame2 = ttk.Frame(self, padding=10, borderwidth=1, relief=RIDGE)
 
-        self.plt2 = self.figure.add_subplot(1,2,2)
+        frame3 = ttk.Frame(main_frame2, padding=10, borderwidth=1, relief=GROOVE)
+        frame3.pack(side=TOP, expand=1, fill=BOTH)
+        frame3.pack_propagate(False)
+
+        self.figure2 = Figure(figsize=(10, 10), dpi=100)
+        self.figure_canvas2 = FigureCanvasTkAgg(self.figure2, frame3)
+        self.figure_canvas2.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
+
+        self.plt2 = self.figure2.add_subplot(1,1,1)
         d = [(f"2024-{m}-01", f"2024-{m}-31") for m in ['02', '03', '04', '05', '06', '07', '08', '09', '10']]
         xx = ['2', '3', '4', '5', '6', '7', '8', '9', '10']
         yy = [sqlitedb.get_month_category_sum('products', el[0], el[1])[0] for el in d]
         self.plt2.bar(xx, yy)
 
-        self.figure_canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
+        frame4 = ttk.Frame(main_frame2, padding=10, borderwidth=1, relief=GROOVE)
+        frame4.pack(side=BOTTOM, expand=0, fill=BOTH)
+        frame4.config(height=100)
+        frame4.pack_propagate(False)
 
 
-        button3 = ttk.Button(master=frame2, text="Вклады",command=self._change)
-        button3.pack(anchor=CENTER, expand=0)
+
+        button4 = ttk.Button(master=frame4, text="Вклады",command=self._change)
+        button4.pack(anchor=CENTER, expand=0)
+
+
+
+
+        main_frame1.pack(side=LEFT, expand=1, fill=BOTH)
+        main_frame1.pack_propagate(False)
+
+        main_frame2.pack(side=RIGHT, expand=1, fill=BOTH)
+        main_frame2.pack_propagate(False)
+
+
+
+
+
+
+
+
 
 
     def _change(self):
         print(1)
-        self.figure.clear()
-        self.figure_canvas.draw()
-        self.plt2 = self.figure.add_subplot(1, 1, 1)
-        d = [(f"2024-{m}-01", f"2024-{m}-31") for m in ['06', '07', '08', '09', '10', '11', '12']]
-        xx = ['6', '7', '8', '9', '10', '11', '12']
-        yy = [sqlitedb.get_month_category_sum('products', el[0], el[1])[0] for el in d]
+        self.figure1.clear()
+        self.figure_canvas1.draw()
+        self.plt2 = self.figure1.add_subplot(1, 1, 1)
+        labels = ["Вклады", 'Долги', 'Накопительные счета', "Наличные", "Карты", "Инвестиции"]
+        sizes = [1500000, 75000, 4000000, 1000, 500000, 0]
 
-        self.plt2.bar(xx, yy)
-        self.figure_canvas.draw()
+        self.plt2.pie(sizes, labels=labels, autopct="%1.1f%%")
+        self.figure_canvas1.draw()
 
 
     def _update(self):

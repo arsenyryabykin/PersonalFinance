@@ -3,7 +3,8 @@ import sqlite3
 
 import openpyxl
 
-def get_data(cat_num, cat_name):
+def get_data(cat_num: str, cat_name: str):
+    # TODO: lalalala
     workbook = openpyxl.load_workbook("1.xlsx")
     sheet = workbook[str("Лист1")]
 
