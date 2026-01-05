@@ -9,6 +9,8 @@ import sqlitedb
 
 matplotlib.use("TkAgg")
 
+d = {'date':'Дата','cafe':'Кафе', 'clothes':'Одежда', 'gifts':'Подарки', 'health':'Здоровье', 'other':'Другое', 'products':'Продукты', 'shoes':'Обувь', 'transport':'Транспорт', 'total':'Итого'}
+
 class Window(Tk):
     def __init__(self, title_, content):
         super().__init__()
@@ -55,7 +57,7 @@ class WW(Tk):
         self.tree = ttk.Treeview(master=self, show="headings", columns=self.columns)
         self.tree.pack(fill=Y, expand=1, anchor=CENTER)
         for cat in self.columns:
-            self.tree.heading(cat, text=cat, anchor=S)
+            self.tree.heading(cat, text=d[cat], anchor=S)
 
         for i in range(1, len(self.columns) + 1):
             self.tree.column("#" + str(i), stretch=YES, width = 70, anchor=CENTER)
@@ -119,7 +121,6 @@ class WindowDep(Tk):
 
         frame.pack(anchor=W, expand=0)
         tmp_frame.pack(anchor=W, expand=1, fill=BOTH)
-
 
 class GraphWindow(Tk):
     # FIXME: asfasfsf
